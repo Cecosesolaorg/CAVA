@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inventario Premium Todo-en-Uno</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- Navegación de Pestañas -->
+    <nav class="app-nav">
+        <button class="nav-tab active" data-target="view-detailed">
+            <i class='bx bx-list-ul'></i> Inventario Detallado
+        </button>
+        <button class="nav-tab" data-target="view-grid">
+            <i class='bx bx-grid-alt'></i> Cuaderno Rápido
+        </button>
+    </nav>
+
+    <!-- Zona Capturable -->
+    <main class="app-main" id="capture-area">
+
+        <!-- VISTA 1: INVENTARIO DETALLADO (Modelo Inicial) -->
+        <div id="view-detailed" class="tab-view active">
+            <div class="app-container-v1">
+                <!-- Sidebar / Form -->
+                <aside class="glass-panel sidebar">
+                    <div class="logo-container">
+                        <i class='bx bx-leaf text-gradient'></i>
+                        <h1 class="text-gradient" style="font-size: 1.4rem;">CAVA CUARTO FERIA DEL ESTE</h1>
+                    </div>
+
+                    <form id="inventory-form" class="inventory-form">
+                        <h2 class="form-title">Nuevo Movimiento</h2>
+
+                        <div class="form-group">
+                            <label for="type">Tipo de Movimiento</label>
+                            <div class="custom-select-wrapper">
+                                <select id="type" name="type" required>
+                                    <option value="in">Entrada (+)</option>
+                                    <option value="out">Salida (-)</option>
+                                </select>
+                                <i class='bx bx-chevron-down arrow-icon'></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product">Producto</label>
+                            <div class="custom-select-wrapper">
+                                <select id="product" name="product" required>
+                                    <option value="" disabled selected>Seleccione</option>
+                                    <option value="Manzanas">Manzanas</option>
+                                    <option value="Peras">Peras</option>
+                                    <option value="Ajos">Ajos</option>
+                                    <option value="Tomates">Tomates</option>
+                                    <option value="Varios">Varios</option>
+                                </select>
+                                <i class='bx bx-chevron-down arrow-icon'></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="unit">Unidad</label>
+                            <div class="custom-select-wrapper">
+                                <select id="unit" name="unit" required>
+                                    <option value="" disabled selected>Seleccione</option>
+                                    <option value="Cajas">Cajas</option>
+                                    <option value="Kilos">Kilos</option>
+                                    <option value="Sacos">Sacos</option>
+                                </select>
+                                <i class='bx bx-chevron-down arrow-icon'></i>
+                            </div>
+                        </div>
+
+                        <!-- NUEVO CAMPO DE CALIBRE -->
+                        <div class="form-group hidden" id="calibre-group">
+                            <label for="calibre">Calibre / Tamaño</label>
+                            <input type="text" id="calibre" name="calibre" placeholder="Ej: 100, 120...">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity" id="lbl-quantity">CAJAS</label>
+                            <input type="number" id="quantity" name="quantity" min="1" step="0.1"
+                                placeholder="Ej: 50 Cajas" required>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class='bx bx-plus-circle'></i>
+                            <span>Registrar</span>
+                        </button>
+                    </form>
+                </aside>
+
+                <!-- Full List Content -->
+                <section class="main-content">
+                    <header class="dashboard-header">
+                        <h2>Resumen</h2>
+                        <div class="date-display" id="current-date"></div>
+                    </header>
+
+                    <div class="summary-grid" id="summary-grid">
+                        <div class="empty-state">No hay inventario</div>
+                    </div>
+
+                    <div class="glass-panel table-container">
+                        <div class="table-header-wrapper">
+                            <h3>Últimos Movimientos</h3>
+                            <button id="btn-clear-history" class="btn-icon" title="Limpiar Historial">
+                                <i class='bx bx-trash'></i>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Prod.</th>
+                                        <th>Unid.</th>
+                                        <th>Cant.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-tbody"></tbody>
+                            </table>
+                            <div id="table-empty-state" class="empty-state hidden">Sin movimientos.</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- VISTA 2: CUADERNO GRID MÓVIL (Adaptado a Modo Oscuro) -->
+        <div id="view-grid" class="tab-view hidden">
+            <div class="grid-app-wrapper">
+
+                <div class="section-title text-gradient">FERIA GRANDE</div>
+                <div class="grid-container main-grid glass-panel">
+                    <!-- MANZANA -->
+                    <div class="grid-col">
+                        <div class="col-header">MANZANA</div><textarea class="notepad" id="fg-manzana"
+                            data-sum-target="sum-fg-manzana"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-fg-manzana">0</span>
+                        </div>
+                    </div>
+                    <!-- PERA -->
+                    <div class="grid-col">
+                        <div class="col-header">PERA</div><textarea class="notepad" id="fg-pera"
+                            data-sum-target="sum-fg-pera"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-fg-pera">0</span>
+                        </div>
+                    </div>
+                    <!-- AJO -->
+                    <div class="grid-col">
+                        <div class="col-header">AJO</div><textarea class="notepad" id="fg-ajo"
+                            data-sum-target="sum-fg-ajo"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-fg-ajo">0</span>
+                        </div>
+                    </div>
+                    <!-- TOMATE -->
+                    <div class="grid-col">
+                        <div class="col-header">TOMATE</div><textarea class="notepad" id="fg-tomate"
+                            data-sum-target="sum-fg-tomate"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-fg-tomate">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title text-gradient" style="margin-top: 1rem;">MINI FERIA</div>
+                <div class="grid-container sub-grid glass-panel">
+                    <!-- MANZANA -->
+                    <div class="grid-col">
+                        <div class="col-header">MANZANA</div><textarea class="notepad" id="mf-manzana"
+                            data-sum-target="sum-mf-manzana"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-mf-manzana">0</span>
+                        </div>
+                    </div>
+                    <!-- PERA -->
+                    <div class="grid-col">
+                        <div class="col-header">PERA</div><textarea class="notepad" id="mf-pera"
+                            data-sum-target="sum-mf-pera"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-mf-pera">0</span>
+                        </div>
+                    </div>
+                    <!-- AJO -->
+                    <div class="grid-col">
+                        <div class="col-header">AJO</div><textarea class="notepad" id="mf-ajo"
+                            data-sum-target="sum-mf-ajo"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-mf-ajo">0</span>
+                        </div>
+                    </div>
+                    <!-- TOMATE -->
+                    <div class="grid-col">
+                        <div class="col-header">TOMATE</div><textarea class="notepad" id="mf-tomate"
+                            data-sum-target="sum-mf-tomate"></textarea>
+                        <div class="col-footer"><span>TOTAL:</span><span class="sum-value" id="sum-mf-tomate">0</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Botones flotantes Globales -->
+    <div class="floating-buttons">
+        <button class="btn-float btn-download" id="btn-download" title="Descargar como Foto">📸</button>
+        <button class="btn-float btn-clear-grid hidden" id="btn-clear-grid" title="Borrar Cuaderno">🗑️</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
